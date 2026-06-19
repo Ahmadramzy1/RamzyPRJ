@@ -32,6 +32,10 @@ jobs:
     - name: Install dependencies
       run: npm install --legacy-peer-deps
 
+    # این بخش برمی‌گردد تا تنظیمات کپاسیتور ساخته شود
+    - name: Initialize Capacitor
+      run: if [ ! -f capacitor.config.json ]; then npx cap init "دفتر حساب" "com.studio.invoice" --web-dir=.; fi
+
     - name: Add Android platform
       run: npx cap add android
 
