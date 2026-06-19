@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دفتر حساب پروژه‌ها</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root{
+    --navy-950:#0a0e17; --navy-900:#0f1626; --navy-800:#161f35; --navy-700:#202c4a; --navy-600:#2c3a5e;
+    --orange-500:#ff7a1a; --orange-400:#ff9a44; --orange-300:#ffb877;
+    --cream:#f4f1ea; --text-dim:#8a93ab; --green:#3ddc97; --red:#ff5c5c;
+    --font-display:'Vazirmatn', 'Tahoma', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{font-family: var(--font-display); background: linear-gradient(160deg, var(--navy-950) 0%, #0c1220 40%, #14101a 100%); color:var(--cream); min-height:100vh; direction:rtl;}
+  body::before{content:''; position:fixed; inset:0; background: radial-gradient(circle at 85% 0%, rgba(255,122,26,0.10), transparent 45%), radial-gradient(circle at 0% 100%, rgba(255,122,26,0.06), transparent 50%); pointer-events:none; z-index:0;}
+  .app{position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:28px 20px 80px;}
+  header.top{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:28px; border-bottom:1px solid var(--navy-700); padding-bottom:20px;}
+  header.top h1{font-size:clamp(24px,4vw,34px); font-weight:800; letter-spacing:-0.01em; background:linear-gradient(95deg, var(--cream) 30%, var(--orange-400) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  header.top .sub{color:var(--text-dim); font-size:13px; margin-top:4px;}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:28px;}
+  .stat-card{background:linear-gradient(145deg, var(--navy-800), var(--navy-900)); border:1px solid var(--navy-700); border-radius:16px; padding:18px; position:relative; overflow:hidden;}
+  .stat-card::after{content:''; position:absolute; top:-30px; left:-30px; width:90px; height:90px; background:var(--orange-500); opacity:.08; border-radius:50%; filter:blur(10px);}
+  .stat-card .label{font-size:12px; color:var(--text-dim); margin-bottom:8px;}
+  .stat-card .value{font-size:24px; font-weight:800; color:var(--cream);}
+  .stat-card .value.accent{color:var(--orange-400);}
+  .controls{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:center;}
+  select, input{background:var(--navy-800); border:1px solid var(--navy-600); color:var(--cream); border-radius:10px; padding:10px 14px; font-family:inherit; font-size:14px; outline:none; width:100%;}
+  select:focus, input:focus{border-color:var(--orange-500);}
+  .btn{border:none; border-radius:10px; padding:11px 20px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; width:100%;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:linear-gradient(95deg, var(--orange-500), var(--orange-400)); color:#1a0e02; box-shadow:0 6px 18px rgba(255,122,26,0.25);}
+  .btn-ghost{background:var(--navy-800); color:var(--cream); border:1px solid var(--navy-600);}
+  .btn-small{padding:6px 12px; font-size:12px; border-radius:8px; width:auto;}
+  .btn-danger{background:rgba(255,92,92,0.12); color:var(--red); border:1px solid rgba(255,92,92,0.3);}
+  .section-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .section-head h2{font-size:18px; font-weight:800; color:var(--orange-400);}
+  .customer-block{background:linear-gradient(150deg, var(--navy-800), var(--navy-900)); border:1px solid var(--navy-700); border-radius:18px; margin-bottom:18px; overflow:hidden;}
+  .customer-header{display:flex; justify-content:space-between; align-items:center; padding:16px 20px; cursor:pointer; flex-wrap:wrap; gap:10px;}
+  .customer-header .name{font-size:17px; font-weight:800;}
+  .customer-header .meta{font-size:12px; color:var(--text-dim); margin-top:3px;}
+  .customer-header .right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .customer-header .totals{text-align:left; direction:ltr; margin-left:10px;}
+  .customer-header .due{font-size:18px; font-weight:800; color:var(--orange-400);}
+  .customer-header .due-label{font-size:11px; color:var(--text-dim); text-align:right; direction:rtl;}
+  .chevron{transition:transform .2s ease; color:var(--text-dim);}
+  .customer-block.collapsed .chevron{transform:rotate(-90deg);}
+  .customer-block.collapsed .projects{display:none;}
+  .projects{border-top:1px solid var(--navy-700);}
+  .project-row{display:flex; justify-content:space-between; align-items:center; padding:13px 20px; border-bottom:1px solid var(--navy-700); gap:10px; flex-wrap:wrap;}
+  .project-row:last-child{border-bottom:none;}
+  .project-row.paid{opacity:0.55;}
+  .project-info{display:flex; flex-direction:column; gap:3px; min-width:150px; flex:1;}
+  .project-info .title{font-weight:700; font-size:14px;}
+  .project-info .date{font-size:11px; color:var(--text-dim);}
+  .project-amount{font-weight:800; font-size:15px; color:var(--cream); min-width:100px; text-align:left; direction:ltr;}
+  .project-actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .status-badge{font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px;}
+  .status-badge.partial{background:rgba(255,122,26,0.12); color:var(--orange-400); border:1px solid rgba(255,122,26,0.3);}
+  .status-badge.done{background:rgba(61,220,151,0.12); color:var(--green); border:1px solid rgba(61,220,151,0.3);}
+  .toggle-pill{font-size:11px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer; border:1px solid var(--navy-600); background:var(--navy-800); color:var(--text-dim); transition: all .15s ease; white-space:nowrap;}
+  .toggle-pill:hover{ border-color:var(--orange-500); }
+  .toggle-pill.active.delivered{background:rgba(61,220,151,0.14); color:var(--green); border-color:rgba(61,220,151,0.4);}
+  .toggle-pill.active.received{background:linear-gradient(95deg, var(--orange-500), var(--orange-400)); color:#1a0e02; border-color:transparent;}
+  .empty{text-align:center; padding:60px 20px; color:var(--text-dim);}
+  .empty .big{font-size:40px; margin-bottom:10px;}
+  .modal-backdrop{position:fixed; inset:0; background:rgba(5,8,15,0.7); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal-backdrop.active{display:flex;}
+  .modal{background:linear-gradient(150deg, var(--navy-800), var(--navy-900)); border:1px solid var(--navy-700); border-radius:18px; padding:24px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto;}
+  .modal h3{font-size:18px; font-weight:800; margin-bottom:18px; color:var(--orange-400);}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px;}
+  .modal-actions{display:flex; gap:10px; margin-top:18px;}
+  .modal-actions .btn{flex:1;}
+  #invoice-render{width:720px; background:linear-gradient(160deg,#0c1220,#14101a 60%,#1a1024); color:#f4f1ea; font-family:'Vazirmatn','Tahoma',sans-serif; direction:rtl; padding:48px; position:absolute; top:-99999px; left:-99999px;}
+  .inv-head{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #ff7a1a; padding-bottom:20px; margin-bottom:24px;}
+  .inv-head h1{font-size:28px; font-weight:800; background:linear-gradient(95deg,#f4f1ea,#ff9a44); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .inv-head .inv-meta{text-align:left; direction:ltr; font-size:13px; color:#8a93ab;}
+  .inv-customer{margin-bottom:24px;}
+  .inv-customer .label{font-size:12px;color:#8a93ab;margin-bottom:4px;}
+  .inv-customer .name{font-size:20px;font-weight:800;}
+  table.inv-table{width:100%; border-collapse:collapse; margin-bottom:24px;}
+  table.inv-table th{text-align:right; font-size:12px; color:#ff9a44; border-bottom:1px solid #2c3a5e; padding:10px 8px;}
+  table.inv-table td{font-size:14px; padding:12px 8px; border-bottom:1px solid #202c4a;}
+  table.inv-table td.amt, table.inv-table th.amt{text-align:left; direction:ltr; font-weight:700;}
+  .inv-total{display:flex; justify-content:flex-end; margin-top:8px;}
+  .inv-total .box{background:linear-gradient(95deg,#ff7a1a,#ff9a44); color:#1a0e02; border-radius:14px; padding:16px 28px; text-align:left; direction:ltr; min-width:220px;}
+  .inv-total .box .lbl{font-size:12px;font-weight:700;opacity:.8; text-align:right; direction:rtl;}
+  .inv-total .box .amt{font-size:26px;font-weight:800;}
+  .inv-footer{margin-top:30px; font-size:12px; color:#8a93ab; text-align:center;}
+  @media(max-width:600px){ .customer-header{align-items:flex-start;} .customer-header .right{width:100%; justify-content:space-between;} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>دفتر حساب پروژه‌ها</h1>
+      <div class="sub">مدیریت پروژه‌های ادیت ویدیو و فاکتور مشتری‌ها</div>
+    </div>
+    <button class="btn btn-primary" id="btn-new-customer" style="width:auto;">+ مشتری جدید</button>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <input type="text" id="search-input" placeholder="🔍 جستجوی نام مشتری یا عنوان پروژه..." style="flex:1; min-width:200px;">
+    <select id="month-filter" style="width:auto; flex:0 0 auto;"></select>
+    <select id="status-filter" style="width:auto; flex:0 0 auto;">
+      <option value="all">همه پروژه‌ها</option>
+      <option value="pending">تسویه نشده</option>
+      <option value="paid">تسویه شده</option>
+    </select>
+  </div>
+
+  <div class="section-head">
+    <h2>مشتری‌ها و پروژه‌ها</h2>
+  </div>
+
+  <div id="customer-list"></div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-backdrop" id="modal-customer">
+  <div class="modal">
+    <h3 id="customer-modal-title">افزودن مشتری جدید</h3>
+    <input type="hidden" id="cust-edit-id">
+    <div class="field">
+      <label>نام مشتری</label>
+      <input type="text" id="cust-name" placeholder="مثلاً: استودیو رنگین کمان">
+    </div>
+    <div class="field">
+      <label>توضیحات (اختیاری)</label>
+      <input type="text" id="cust-note" placeholder="شماره تماس، آیدی تلگرام، ...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-customer')">انصراف</button>
+      <button class="btn btn-primary" id="save-customer">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- Project Modal -->
+<div class="modal-backdrop" id="modal-project">
+  <div class="modal">
+    <h3 id="project-modal-title">افزودن پروژه جدید</h3>
+    <input type="hidden" id="proj-customer-id">
+    <input type="hidden" id="proj-edit-id">
+    <div class="field">
+      <label>عنوان پروژه</label>
+      <input type="text" id="proj-title" placeholder="مثلاً: ادیت کلیپ تبلیغاتی">
+    </div>
+    <div class="field">
+      <label>مبلغ کل (تومان)</label>
+      <input type="text" id="proj-amount" placeholder="1,500,000" oninput="formatInputMoney(this)">
+    </div>
+    <div class="field">
+      <label>مبلغ پرداخت شده (تومان)</label>
+      <input type="text" id="proj-paid-amount" placeholder="0" oninput="formatInputMoney(this)">
+    </div>
+    <div class="field">
+      <label>تاریخ (شمسی - مثال: 1403/05/12)</label>
+      <input type="text" id="proj-date" placeholder="1403/05/12">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-project')">انصراف</button>
+      <button class="btn btn-primary" id="save-project">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<div id="invoice-render"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
