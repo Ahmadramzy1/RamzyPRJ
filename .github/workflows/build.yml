@@ -32,22 +32,22 @@ jobs:
     - name: Install dependencies
       run: npm install --legacy-peer-deps
 
-    # ساخت پوشه www و کپی کردن فایل‌های اصلی پروژه داخل آن
-    - name: Prepare www directory
-      run: |
-        mkdir -p www
-        cp *.html *.js *.css www/ 2>/dev/null || true
-        # اگر پوشه assets یا پوشه‌های مشابه دارید اینجا کپی می‌شوند
-        if [ -d "assets" ]; then cp -r assets www/; fi
-        if [ -d "img" ]; then cp -r img www/; fi
-        if [ -d "css" ]; then cp -r css www/; fi
+    - name: Fix Node Modules Permissions
+      run: chmod -R +x node_modules/.bin
 
-    # ساخت تنظیمات کپاسیتور با مسیر صحیح
-    - name: Initialize Capacitor
-      run: if [ ! -f capacitor.config.json ]; then npx cap init "دفتر حساب" "com.studio.invoice" --web-dir=www; fi
+    - name: Build Web App (Vite)
+      run: npm run build
+
+    - name: Setup Capacitor Config
+      run: |
+        if [ ! -f capacitor.config.json ]; then
+          npx cap init "دفتر حساب" "com.studio.invoice" --web-dir=www
+        else
+          node -e "const fs=require('fs'); const c=JSON.parse(fs.readFileSync('capacitor.config.json','utf8')); c.webDir='www'; fs.writeFileSync('capacitor.config.json', JSON.stringify(c, null, 2));"
+        fi
 
     - name: Add Android platform
-      run: npx cap add android
+      run: if [ ! -d "android" ]; then npx cap add android; fi
 
     - name: Sync Capacitor
       run: npx cap sync android
