@@ -35,6 +35,13 @@ jobs:
     - name: Fix Node Modules Permissions
       run: chmod -R +x node_modules/.bin
 
+    - name: Ensure Vite Config
+      run: |
+        if [ ! -f vite.config.js ]; then
+          echo "import { defineConfig } from 'vite';" > vite.config.js
+          echo "export default defineConfig({ build: { outDir: 'www' } });" >> vite.config.js
+        fi
+
     - name: Build Web App (Vite)
       run: npm run build
 
