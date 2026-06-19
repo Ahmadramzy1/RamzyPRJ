@@ -32,9 +32,26 @@ jobs:
     - name: Install dependencies
       run: npm install --legacy-peer-deps
 
-    # این بخش برمی‌گردد تا تنظیمات کپاسیتور ساخته شود
+    # اضافه شدن مرحله بیلد وب (اگر از ریکت/ویو استفاده می‌کنید این خط کار شما را راه می‌اندازد)
+    - name: Build Web App
+      run: npm run build
+
+    # ساخت تنظیمات کپاسیتور با پوشه صحیح (به جای نقطه)
     - name: Initialize Capacitor
-      run: if [ ! -f capacitor.config.json ]; then npx cap init "دفتر حساب" "com.studio.invoice" --web-dir=.; fi
+      run: if [ ! -f capacitor.config.json ]; then npx cap init "دفتر حساب" "com.studio.invoice" --web-dir=www; fi
+
+    # اگر پوشه www وجود نداشت، آن را می‌سازد و فایل‌های بیلد شده را آنجا می‌ریزد
+    - name: Ensure www directory exists
+      run: |
+        if [ ! -d "www" ]; then
+          mkdir www
+          # اگر خروجی بیلد شما در پوشه دیگری (مثل dist) است، آن را اینجا کپی می‌کنیم
+          if [ -d "dist" ]; then
+            cp -r dist/* www/
+          elif [ -f "index.html" ]; then
+            cp -r *.html *.js *.css assets www/ 2>/dev/null || true
+          fi
+        fi
 
     - name: Add Android platform
       run: npx cap add android
