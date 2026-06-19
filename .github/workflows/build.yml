@@ -5,7 +5,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # تغییر از latest به 22.04 برای رفع مشکل نسخه نود جی‌اس
+    runs-on: ubuntu-22.04 
+    
+    # اضافه شدن دسترسی‌های ضروری برای نسخه 4
+    permissions:
+      contents: read
+      actions: write
 
     steps:
     - name: Checkout code
@@ -33,6 +39,10 @@ jobs:
 
     - name: Copy web assets
       run: npx cap copy
+
+    # این خط اضافه شده تا در لینوکس گیت‌هاب، فایل گریدل دسترسی اجرایی داشته باشد
+    - name: Make Gradle Executable
+      run: chmod +x android/gradlew
 
     - name: Build APK
       run: cd android && ./gradlew assembleDebug
