@@ -5,13 +5,15 @@ on:
 
 jobs:
   build:
-    # تغییر از latest به 22.04 برای رفع مشکل نسخه نود جی‌اس
-    runs-on: ubuntu-22.04 
+    runs-on: ubuntu-22.04
     
-    # اضافه شدن دسترسی‌های ضروری برای نسخه 4
     permissions:
       contents: read
       actions: write
+
+    # این ۳ خط مشکل ضربدر قرمز شما را حل می‌کند
+    env:
+      ACTIONS_RUNNER_FORCE_NODE_JS: '20'
 
     steps:
     - name: Checkout code
@@ -40,7 +42,6 @@ jobs:
     - name: Copy web assets
       run: npx cap copy
 
-    # این خط اضافه شده تا در لینوکس گیت‌هاب، فایل گریدل دسترسی اجرایی داشته باشد
     - name: Make Gradle Executable
       run: chmod +x android/gradlew
 
